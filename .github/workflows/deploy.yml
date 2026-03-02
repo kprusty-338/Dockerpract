@@ -9,9 +9,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    outputs:
-      image_tag: ${{ steps.meta.outputs.tag }}
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
