@@ -36,9 +36,9 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker Image
-        run: docker build -t kiranprusty/devops:${{ steps.meta.outputs.tag }} .
+        run: docker build -t kiranprusty/devops:latest .
       - name: Push Docker Image
-        run: docker push kiranprusty/devops:${{ steps.meta.outputs.tag }}
+        run: docker push kiranprusty/devops:latest
 
   deploy:
     needs: build
@@ -46,7 +46,7 @@ jobs:
 
     steps:
       - name: Pull Image
-        run: docker pull kiranprusty/devops:devops:${{ needs.build.outputs.image_tag }}
+        run: docker pull kiranprusty/devops:latest
 
       - name: Stop Old Container (if exists)
         run: |
@@ -57,10 +57,11 @@ jobs:
         run: |
           docker run -d -p 8080:8080 \
           --name login-app \
-          kiranprusty/devops:${{ needs.build.outputs.image_tag }}
+          kiranprusty/devops:latest
 
       - name: Test Deployment
         run: |
           sleep 10
           curl http://localhost:8080
 
+          
