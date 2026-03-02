@@ -1,4 +1,4 @@
-name: Java CI/CD Pipeline
+name: Pipeline
 
 on:
   push:
@@ -30,6 +30,7 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=kprusty-338_Dockerpract
+            -Dsonar.organization=kprusty-338
             -Dsonar.sources=.
             -Dsonar.host.url=https://sonarcloud.io
 
