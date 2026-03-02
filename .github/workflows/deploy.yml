@@ -55,8 +55,7 @@ jobs:
           docker rm login-app || true
 
       - name: Run New Container
-        run: docker run -d -p 8080:8080 --name login-app \
-          kiranprusty/devops:latest
+        run: docker run -d -p 8080:8080 --name login-app \ kiranprusty/devops:latest
 
       - name: Test Deployment
         run: |
