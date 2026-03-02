@@ -1,0 +1,70 @@
+name: Java CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Compile Java
+        run: javac LoginServer.java
+
+      # ✅ NEW STEP: SonarQube Scan
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.sonar_token }}
+        with:
+          args: >
+            -Dsonar.projectKey=kprusty-338_Dockerpract
+            -Dsonar.sources=.
+            -Dsonar.host.url=https://sonarcloud.io
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker Image
+        run: docker build -t kiranprusty/devops:latest .
+
+      - name: Push Docker Image
+        run: docker push kiranprusty/devops:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pull Image
+        run: docker pull kiranprusty/devops:latest
+
+      - name: Stop Old Container (if exists)
+        run: |
+          docker stop login-app || true
+          docker rm login-app || true
+
+      - name: Run New Container
+        run: |
+          docker run -d -p 8080:8080 \
+          --name login-app \
+          kiranprusty/devops:latest
+
+      - name: Test Deployment
+        run: |
+          sleep 10
+          curl http://localhost:8080
